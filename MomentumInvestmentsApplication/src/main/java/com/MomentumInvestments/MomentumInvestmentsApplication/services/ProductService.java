@@ -2,7 +2,7 @@ package com.MomentumInvestments.MomentumInvestmentsApplication.services;
 
 import com.MomentumInvestments.MomentumInvestmentsApplication.constants.ProductType;
 import com.MomentumInvestments.MomentumInvestmentsApplication.dto.Request.InvestProduct;
-import com.MomentumInvestments.MomentumInvestmentsApplication.dto.Response.InvestorProducts;
+import com.MomentumInvestments.MomentumInvestmentsApplication.dto.Responses.InvestorProducts;
 import com.MomentumInvestments.MomentumInvestmentsApplication.entity.Investor;
 import com.MomentumInvestments.MomentumInvestmentsApplication.entity.Product;
 import com.MomentumInvestments.MomentumInvestmentsApplication.repository.InvestorRepository;

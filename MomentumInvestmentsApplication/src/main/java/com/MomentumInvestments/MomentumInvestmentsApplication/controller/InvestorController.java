@@ -1,30 +1,43 @@
 package com.MomentumInvestments.MomentumInvestmentsApplication.controller;
 
+import com.MomentumInvestments.MomentumInvestmentsApplication.dto.Request.InvestorAuthenticationRequest;
+import com.MomentumInvestments.MomentumInvestmentsApplication.dto.Request.InvestorCreation;
 import com.MomentumInvestments.MomentumInvestmentsApplication.entity.Investor;
 import com.MomentumInvestments.MomentumInvestmentsApplication.services.InvestorService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/investor")
+@AllArgsConstructor
+@Slf4j
+@Tag(name="Investor")
 public class InvestorController {
 
     private final InvestorService investorService;
 
-    // Constructor Injection
-    @Autowired
-    public InvestorController(InvestorService investorService) {
-        this.investorService = investorService;
-    }
-
     @GetMapping
+    @Operation(summary = "Get All Investor")
     public List<Investor> getAllInvestors(){
         return investorService.getAllInvestors();
     }
 
-    // other necessary code
+
+    @PostMapping(path = "/login")
+    @Operation(summary = "Login & Get JWT Token used to access all tokens")
+    public ResponseEntity<String> authenticateAndGetToken(@RequestBody final InvestorAuthenticationRequest authRequest) {
+        return investorService.authenticateInvestor(authRequest);
+    }
+
+    @PostMapping("/register")
+    @Operation(summary = "Register Investor in the system")
+    public ResponseEntity<String> addNewUser(@RequestBody InvestorCreation investor) {
+        return investorService.createInvestor(investor);
+    }
 }

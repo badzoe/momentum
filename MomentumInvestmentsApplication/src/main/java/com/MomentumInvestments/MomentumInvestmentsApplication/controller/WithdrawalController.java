@@ -1,25 +1,25 @@
 package com.MomentumInvestments.MomentumInvestmentsApplication.controller;
 
 import com.MomentumInvestments.MomentumInvestmentsApplication.services.WithdrawalService;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 
 @RestController
+@AllArgsConstructor
 @RequestMapping("/api/withdrawals")
+@Tag(name="Withdrawal")
 public class WithdrawalController {
 
-    @Autowired
-    private WithdrawalService withdrawalService;
+    private final WithdrawalService withdrawalService;
 
-    @PostMapping
-    public ResponseEntity<String> createWithdrawal(@RequestParam Long productId, @RequestParam BigDecimal amount) {
-      withdrawalService.processWithdrawal(productId, amount);
-      return ResponseEntity.ok("Withdrawal processed successfully");
+    @PostMapping("/{productId}/{amount}")
+    @Operation(summary = "Withdraw Product")
+    public ResponseEntity<String> createWithdrawal(@PathVariable String productId, @PathVariable String amount) {
+        return withdrawalService.processWithdrawal(Long.valueOf(productId),BigDecimal.valueOf(Long.parseLong(amount)));
     }
 }
