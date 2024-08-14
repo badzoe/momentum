@@ -2,8 +2,6 @@ package com.MomentumInvestments.MomentumInvestmentsApplication.config.security;
 
 
 import com.MomentumInvestments.MomentumInvestmentsApplication.dto.Request.CredentialsCreation;
-import com.MomentumInvestments.MomentumInvestmentsApplication.entity.Credentials;
-import com.MomentumInvestments.MomentumInvestmentsApplication.repository.CredentialsRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

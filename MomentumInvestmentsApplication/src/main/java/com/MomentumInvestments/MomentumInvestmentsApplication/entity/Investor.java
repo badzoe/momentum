@@ -1,15 +1,16 @@
 package com.MomentumInvestments.MomentumInvestmentsApplication.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 public class Investor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,5 +21,6 @@ public class Investor {
     private String address;
     private String phoneNumber;
     private String email;
-
+    private String password;
+    private String role;
 }

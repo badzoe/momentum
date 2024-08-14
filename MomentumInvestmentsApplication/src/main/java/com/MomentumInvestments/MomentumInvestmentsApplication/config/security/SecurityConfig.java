@@ -1,5 +1,4 @@
 package com.MomentumInvestments.MomentumInvestmentsApplication.config.security;
-import com.MomentumInvestments.MomentumInvestmentsApplication.repository.CredentialsRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
