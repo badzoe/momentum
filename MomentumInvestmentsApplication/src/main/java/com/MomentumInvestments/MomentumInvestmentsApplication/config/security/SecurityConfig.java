@@ -1,4 +1,5 @@
 package com.MomentumInvestments.MomentumInvestmentsApplication.config.security;
+import com.MomentumInvestments.MomentumInvestmentsApplication.repository.InvestorRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,21 +23,21 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 @EnableMethodSecurity
 @AllArgsConstructor
-
 public class SecurityConfig {
     private final JwtAuthFilter authFilter;
 
     // User Creation
     @Bean
-    public UserDetailsService userDetailsService(CredentialsRepository repository, PasswordEncoder passwordEncoder) {
-        return new UserInfoService(repository, passwordEncoder);
+    public UserDetailsService userDetailsService(InvestorRepository investorRepository, PasswordEncoder passwordEncoder) {
+        return new UserInfoService(investorRepository, passwordEncoder);
     }
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationProvider authenticationProvider) throws Exception {
         return http
-                .authorizeHttpRequests((authz) -> authz
-                        .requestMatchers("admin/login","admin/register").permitAll()
-                        .requestMatchers("/v2").authenticated()
+                .authorizeHttpRequests((auth) -> auth
+                        .requestMatchers("api/investor/register","api/investor/login","/openapi-ui.html").permitAll()
+                        .anyRequest().authenticated()
+
                 )
                 .httpBasic(withDefaults()).csrf((csrf) -> csrf.disable())
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
