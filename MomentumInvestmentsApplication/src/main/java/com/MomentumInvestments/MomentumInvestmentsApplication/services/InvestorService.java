@@ -2,7 +2,6 @@ package com.MomentumInvestments.MomentumInvestmentsApplication.services;
 
 import com.MomentumInvestments.MomentumInvestmentsApplication.config.security.JwtService;
 import com.MomentumInvestments.MomentumInvestmentsApplication.dto.Request.InvestorAuthenticationRequest;
-import com.MomentumInvestments.MomentumInvestmentsApplication.dto.Request.InvestorCreation;
 import com.MomentumInvestments.MomentumInvestmentsApplication.entity.Investor;
 import com.MomentumInvestments.MomentumInvestmentsApplication.repository.InvestorRepository;
 import lombok.AllArgsConstructor;
