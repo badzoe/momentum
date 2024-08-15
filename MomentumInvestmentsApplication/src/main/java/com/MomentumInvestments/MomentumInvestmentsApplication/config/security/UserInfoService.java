@@ -4,6 +4,7 @@ package com.MomentumInvestments.MomentumInvestmentsApplication.config.security;
 import com.MomentumInvestments.MomentumInvestmentsApplication.dto.Request.InvestorCreation;
 import com.MomentumInvestments.MomentumInvestmentsApplication.entity.Investor;
 import com.MomentumInvestments.MomentumInvestmentsApplication.repository.InvestorRepository;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

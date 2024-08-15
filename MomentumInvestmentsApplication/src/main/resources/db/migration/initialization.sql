@@ -12,7 +12,7 @@ INTO
   product
   (type, name, balance, investor_id)
 VALUES
-  (0, 'TEST RETIREMENT', 500000, @investor_id);
+  (0, 'TEST RETIREMENT', 50000, @investor_id);
 INSERT
 INTO
   product

@@ -28,6 +28,17 @@ public class InvestorController {
         return investorService.getAllInvestors();
     }
 
+    @GetMapping("/{investorID}")
+    @Operation(summary = "Get Investor By ID")
+    public Investor getInvestorByID(@PathVariable Long investorID){
+        return investorService.getInvestorByID(investorID);
+    }
+
+    @GetMapping("investorBy/{productType}")
+    @Operation(summary = "Get Investors By Product Type")
+    public List<Investor> getInvestorsByProductType(@PathVariable String productType){
+        return investorService.getInvestorsByProductType(productType);
+    }
 
     @PostMapping(path = "/login")
     @Operation(summary = "Login & Get JWT Token used to access all tokens")

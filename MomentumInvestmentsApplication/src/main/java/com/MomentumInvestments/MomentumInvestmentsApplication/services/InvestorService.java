@@ -1,9 +1,11 @@
 package com.MomentumInvestments.MomentumInvestmentsApplication.services;
 
 import com.MomentumInvestments.MomentumInvestmentsApplication.config.security.JwtService;
+import com.MomentumInvestments.MomentumInvestmentsApplication.constants.ProductType;
 import com.MomentumInvestments.MomentumInvestmentsApplication.dto.Request.InvestorAuthenticationRequest;
 import com.MomentumInvestments.MomentumInvestmentsApplication.dto.Request.InvestorCreation;
 import com.MomentumInvestments.MomentumInvestmentsApplication.entity.Investor;
+import com.MomentumInvestments.MomentumInvestmentsApplication.repository.InvestorProductsRepository;
 import com.MomentumInvestments.MomentumInvestmentsApplication.repository.InvestorRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,15 +16,18 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 @Slf4j
 public class InvestorService {
+    private final InvestorProductsRepository investorProductsRepository;
 
     private InvestorRepository investorRepository;
     private final JwtService jwtService;
@@ -33,6 +38,16 @@ public class InvestorService {
 
     public List<Investor> getAllInvestors() {
         return investorRepository.findAll();
+    }
+    public Investor getInvestorByID(Long investorID) {
+        return investorRepository.findById(investorID).get();
+    }
+
+    public List<Investor> getInvestorsByProductType(@PathVariable String productType){
+        return investorProductsRepository.findByProductID_TypeOrderByIdAsc(ProductType.valueOf(productType))
+                .stream()
+                .map(investorProducts -> investorProducts.getInvestorID())
+                .collect(Collectors.toList());
     }
     public ResponseEntity<String> authenticateInvestor(@RequestBody final InvestorAuthenticationRequest authRequest) {
         try{

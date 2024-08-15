@@ -1,10 +1,12 @@
 package com.MomentumInvestments.MomentumInvestmentsApplication.services;
 
 import com.MomentumInvestments.MomentumInvestmentsApplication.constants.ProductType;
-import com.MomentumInvestments.MomentumInvestmentsApplication.dto.Request.InvestProduct;
-import com.MomentumInvestments.MomentumInvestmentsApplication.dto.Responses.InvestorProducts;
+import com.MomentumInvestments.MomentumInvestmentsApplication.dto.Request.InvestProductRequest;
+import com.MomentumInvestments.MomentumInvestmentsApplication.dto.Responses.InvestorProductsResponse;
 import com.MomentumInvestments.MomentumInvestmentsApplication.entity.Investor;
+import com.MomentumInvestments.MomentumInvestmentsApplication.entity.InvestorProducts;
 import com.MomentumInvestments.MomentumInvestmentsApplication.entity.Product;
+import com.MomentumInvestments.MomentumInvestmentsApplication.repository.InvestorProductsRepository;
 import com.MomentumInvestments.MomentumInvestmentsApplication.repository.InvestorRepository;
 import com.MomentumInvestments.MomentumInvestmentsApplication.repository.ProductRepository;
 import lombok.AllArgsConstructor;
@@ -22,36 +24,63 @@ import java.util.stream.Collectors;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final InvestorProductsRepository investorProductsRepository;
     private final InvestorRepository investorRepository;
 
-    public List<InvestorProducts> getProductsByInvestorId(Long investorsId){
-        return productRepository.findByInvestorId(investorsId).stream()
-                .map(investorProduct -> new InvestorProducts(investorProduct.getId(),investorProduct.getType().name(), investorProduct.getName(),investorProduct.getBalance()))
+    public List<InvestorProductsResponse> getProductsByInvestorId(Long investorsId){
+        return investorProductsRepository.findByInvestorID_IdOrderByIdAsc(investorsId).stream()
+                .map(investorProduct -> new InvestorProductsResponse(investorProduct.getId(),investorProduct.getProductID().getType().name(), investorProduct.getProductID().getType().name(),investorProduct.getBalance()))
                 .collect(Collectors.toList());
 
     }
 
-    public ResponseEntity<String> addProductsPerInvestor(InvestProduct investProduct){
+    public ResponseEntity<List<Product>> getAllProducts(){
+        return ResponseEntity.ok(productRepository.findAll());
+    }
 
-        Optional<Investor> optionalInvestor =  investorRepository.findById(investProduct.investor());
+    public ResponseEntity<String> addProducts(String productName) {
+        Optional<Product> optionalProduct = productRepository.findFirstByTypeOrderByIdDesc(ProductType.valueOf(productName));
+        if(optionalProduct.isPresent()){
+            return ResponseEntity.badRequest().body("Product already exists");
+
+        }else {
+            Product productToBeAdded = new Product();
+            productToBeAdded.setId(0L);
+            productToBeAdded.setType(ProductType.valueOf(productName));
+            productRepository.save(productToBeAdded);
+            return ResponseEntity.ok("Successfully added product");
+        }
+    }
+
+    public ResponseEntity<String> addProductsPerInvestor(InvestProductRequest investProduct){
+
+        Optional<Investor> optionalInvestor =  investorRepository.findById(investProduct.investorID());
         if(optionalInvestor.isPresent()){
-            Optional<Product> optionalProduct = productRepository.findFirstByTypeAndInvestor_IdOrderByIdDesc(ProductType.valueOf(investProduct.type()),investProduct.investor());
+            Optional<Product> optionalProduct =  productRepository.findById(investProduct.productID());
             if(optionalProduct.isPresent()){
-                Product productToUpdate = optionalProduct.get();
-                productToUpdate.setBalance(productToUpdate.getBalance().add(investProduct.balance()));
-                productRepository.save(productToUpdate);
-                return ResponseEntity.ok("Successfully updated the product balance");
+                Optional<InvestorProducts> optionalInvestorProducts = investorProductsRepository.findFirstByProductID_IdAndInvestorID_IdOrderByIdDesc(investProduct.productID(), investProduct.investorID());
+                if(optionalInvestorProducts.isPresent()){
+                    InvestorProducts investorProductsToUpdate = optionalInvestorProducts.get();
+                    investorProductsToUpdate.setBalance(investorProductsToUpdate.getBalance().add(investProduct.balance()));
+                    investorProductsRepository.save(investorProductsToUpdate);
+                    return ResponseEntity.ok("Successfully updated the investors product balance");
+
+                }else {
+                    InvestorProducts newInvestorProduct = new InvestorProducts();
+                    newInvestorProduct.setId(0L);
+                    newInvestorProduct.setInvestorID(optionalInvestor.get());
+                    newInvestorProduct.setProductID(optionalProduct.get());
+                    newInvestorProduct.setBalance(investProduct.balance());
+                    investorProductsRepository.save(newInvestorProduct);
+                    return ResponseEntity.ok("Successfully saved investor product");
+
+
+                }
 
             }else {
-                Product newProduct = new Product();
-                newProduct.setId(0L);
-                newProduct.setName(investProduct.name());
-                newProduct.setType(ProductType.valueOf(investProduct.type()));
-                newProduct.setBalance(investProduct.balance());
-                newProduct.setInvestor(optionalInvestor.get());
-                productRepository.save(newProduct);
-                return ResponseEntity.ok("Successfully created a product");
+                return ResponseEntity.badRequest().body("Product doesn't exist");
             }
+
         }else {
             return ResponseEntity.ok("Investor doesn't exist");
         }

@@ -1,13 +1,10 @@
 package com.MomentumInvestments.MomentumInvestmentsApplication.services;
 
 import com.MomentumInvestments.MomentumInvestmentsApplication.constants.ProductType;
-import com.MomentumInvestments.MomentumInvestmentsApplication.entity.AuditTrail;
-import com.MomentumInvestments.MomentumInvestmentsApplication.entity.Product;
-import com.MomentumInvestments.MomentumInvestmentsApplication.entity.Withdrawal;
+import com.MomentumInvestments.MomentumInvestmentsApplication.dto.Responses.WithdrawalsResponse;
+import com.MomentumInvestments.MomentumInvestmentsApplication.entity.*;
 import com.MomentumInvestments.MomentumInvestmentsApplication.exception.ValidationException;
-import com.MomentumInvestments.MomentumInvestmentsApplication.repository.AuditTrailRepository;
-import com.MomentumInvestments.MomentumInvestmentsApplication.repository.ProductRepository;
-import com.MomentumInvestments.MomentumInvestmentsApplication.repository.WithdrawalRepository;
+import com.MomentumInvestments.MomentumInvestmentsApplication.repository.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -18,73 +15,158 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 @Slf4j
 public class WithdrawalService {
     private final ProductRepository productRepository;
+    private final InvestorRepository investorRepository;
+    private final InvestorProductsRepository investorProductsRepository;
     private final WithdrawalRepository withdrawalRepository;
     private final AuditTrailRepository auditTrailRepository;
 
+    public ResponseEntity<List<WithdrawalsResponse>> successfulWithdrawalsPerProduct (String productType ){
+
+        return ResponseEntity.ok(withdrawalRepository.findByProduct_ProductID_TypeAndStatusOrderByIdAsc(ProductType.valueOf(productType),"DONE")
+                .stream()
+                .map(withdrawal -> new WithdrawalsResponse(withdrawal.getId(),productType.toUpperCase(), withdrawal.getStatus(), withdrawal.getAmount(),withdrawal.getTimestamp(),withdrawal.getProduct().getInvestorID().getName()+" "+ withdrawal.getProduct().getInvestorID().getSurname()) )
+                .collect(Collectors.toList()));
+
+    }
+
+    public ResponseEntity<List<WithdrawalsResponse>> failedWithdrawalsPerProduct (String productType ){
+
+        return ResponseEntity.ok(withdrawalRepository.findByProduct_ProductID_TypeAndStatusContainsOrderByIdAsc(ProductType.valueOf(productType),"FAILED")
+                .stream()
+                .map(withdrawal -> new WithdrawalsResponse(withdrawal.getId(),productType.toUpperCase(), withdrawal.getStatus(), withdrawal.getAmount(),withdrawal.getTimestamp(),withdrawal.getProduct().getInvestorID().getName()+" "+ withdrawal.getProduct().getInvestorID().getSurname()) )
+                .collect(Collectors.toList()));
+
+    }
+
     @Transactional
-    public ResponseEntity<String> processWithdrawal(Long productId, BigDecimal amount) throws ValidationException {
-        Optional<Product> product = productRepository.findById(productId);
-        if(product.isPresent()){
-            if(product.get().getType().equals(ProductType.RETIREMENT) && Period.between(product.get().getInvestor().getDateOfBirth(),LocalDate.now()).getYears() < 65){
-                return ResponseEntity.badRequest().body("Investor cannot perform withdrawal on "+ ProductType.RETIREMENT.name()+" when age is less than 65");
-            }else if (product.get().getBalance().compareTo(amount)< 0 ){
-                return ResponseEntity.badRequest().body("Investor cannot withdraw amount greater than current balance");
-            }else if(product.get().getBalance().multiply(new BigDecimal("0.9")).compareTo(amount) < 0 ){
-                return ResponseEntity.badRequest().body("Investor cannot withdraw an amount 90% + of the current balance");
+    public ResponseEntity<String> processWithdrawal(Long investorID, Long productId, BigDecimal amount) throws ValidationException {
+        Optional<Investor> optionalInvestor = investorRepository.findById(investorID);
+        if (optionalInvestor.isEmpty()) {
 
-            }else {
-                try {
-
-
-                    Withdrawal withdrawal = new Withdrawal();
-                    withdrawal.setProduct(product.get());
-                    withdrawal.setAmount(amount);
-                    withdrawal.setTimestamp(LocalDateTime.now());
-                    withdrawal.setStatus("STARTED");
-                    withdrawalRepository.save(withdrawal);
-
-                    // Send an internal event to move the process to EXECUTING status
-                    withdrawal.setStatus("EXECUTING");
-                    withdrawalRepository.save(withdrawal);
-
-                    // Deduct the amount from the product balance
-                    product.get().setBalance(product.get().getBalance().subtract(amount));
-                    productRepository.save(product.get());
-
-                    // Create an audit trail for the product balance change
-                    AuditTrail auditTrail = new AuditTrail();
-                    auditTrail.setProductId(product.get().getId());
-                    auditTrail.setPreviousBalance(product.get().getBalance().add(amount));
-                    auditTrail.setNewBalance(product.get().getBalance());
-                    auditTrailRepository.save(auditTrail);
-
-                    // Move the process to DONE status
-                    withdrawal.setStatus("DONE");
-                    withdrawalRepository.save(withdrawal);
-
-                    // Create an audit trail for the withdrawal process status change
-                    AuditTrail withdrawalAuditTrail = new AuditTrail();
-                    withdrawalAuditTrail.setWithdrawalId(withdrawal.getId());
-                    withdrawalAuditTrail.setPreviousStatus("EXECUTING");
-                    withdrawalAuditTrail.setNewStatus("DONE");
-                    auditTrailRepository.save(withdrawalAuditTrail);
-
-                    return ResponseEntity.ok("Successful withdrawal");
-
-                }catch (Exception ex){
-                    log.error(ex.toString());
-                    return ResponseEntity.internalServerError().body(ex.getMessage());
-                }
-            }
-        }else{
-            return ResponseEntity.badRequest().body("Product not found");
+            return ResponseEntity.badRequest().body("Investor not registered");
         }
+
+        Optional<Product> optionalProduct = productRepository.findById(productId);
+        if (optionalProduct.isEmpty()) {
+            return ResponseEntity.badRequest().body("Product not registered");
+        }
+
+        Optional<InvestorProducts> optionalInvestorProducts = investorProductsRepository
+                .findFirstByProductID_IdAndInvestorID_IdOrderByIdDesc(productId, investorID);
+
+        if (optionalInvestorProducts.isEmpty()) {
+            return ResponseEntity.badRequest().body("Investor doesn't have an investment that matches the provided details");
+        }
+
+        ResponseEntity<String> validationResponse = validateWithdrawal(optionalInvestor.get(), optionalProduct.get(), optionalInvestorProducts.get(), amount);
+        if (validationResponse != null) {
+            return validationResponse;
+        }
+
+        return executeWithdrawal(optionalInvestorProducts.get(), amount);
+    }
+
+
+    private ResponseEntity<String> validateWithdrawal(Investor investor, Product product, InvestorProducts investorProducts, BigDecimal amount) {
+        // Create a base Withdrawal for potential error cases
+        Withdrawal errorWithdrawal = createBaseWithdrawal(investorProducts, amount);
+
+        // Validate retirement product and age condition
+        if (isRetirementWithdrawalDisallowed(investor, product)) {
+            return handleFailedWithdrawal(errorWithdrawal, "Investor cannot perform withdrawal on " + ProductType.RETIREMENT.name() + " when age is less than 65");
+        }
+
+        // Validate balance is sufficient for withdrawal
+        if (isWithdrawalExceedingBalance(investorProducts, amount)) {
+            return handleFailedWithdrawal(errorWithdrawal, "Investor cannot withdraw an amount greater than the current balance");
+        }
+
+        // Validate withdrawal is within 90% of the current balance
+        if (isWithdrawalExceeding90Percent(investorProducts, amount)) {
+            return handleFailedWithdrawal(errorWithdrawal, "Investor cannot withdraw an amount greater than 90% of the current balance");
+        }
+
+        return null; // Validation passed
+    }
+
+    private Withdrawal createBaseWithdrawal(InvestorProducts investorProducts, BigDecimal amount) {
+        Withdrawal withdrawal = new Withdrawal();
+        withdrawal.setId(0L);
+        withdrawal.setAmount(amount);
+        withdrawal.setProduct(investorProducts);
+        return withdrawal;
+    }
+
+    private boolean isRetirementWithdrawalDisallowed(Investor investor, Product product) {
+        return product.getType().equals(ProductType.RETIREMENT) &&
+                Period.between(investor.getDateOfBirth(), LocalDate.now()).getYears() < 65;
+    }
+
+    private boolean isWithdrawalExceedingBalance(InvestorProducts investorProducts, BigDecimal amount) {
+        return investorProducts.getBalance().compareTo(amount) < 0;
+    }
+
+    private boolean isWithdrawalExceeding90Percent(InvestorProducts investorProducts, BigDecimal amount) {
+        return investorProducts.getBalance().multiply(new BigDecimal("0.9")).compareTo(amount) < 0;
+    }
+
+    private ResponseEntity<String> handleFailedWithdrawal(Withdrawal errorWithdrawal, String failureMessage) {
+        errorWithdrawal.setTimestamp(LocalDateTime.now());
+        errorWithdrawal.setStatus("FAILED - " + failureMessage);
+        withdrawalRepository.save(errorWithdrawal);
+        return ResponseEntity.badRequest().body(failureMessage);
+    }
+
+    private ResponseEntity<String> executeWithdrawal(InvestorProducts investorProducts, BigDecimal amount) {
+        Withdrawal withdrawal = new Withdrawal();
+        withdrawal.setProduct(investorProducts);
+        withdrawal.setAmount(amount);
+        withdrawal.setTimestamp(LocalDateTime.now());
+        withdrawal.setStatus("STARTED");
+        withdrawalRepository.save(withdrawal);
+
+        updateWithdrawalStatus(withdrawal, "EXECUTING");
+
+        // Deduct the amount from the product balance
+        BigDecimal previousBalance = investorProducts.getBalance();
+        investorProducts.setBalance(previousBalance.subtract(amount));
+        investorProductsRepository.save(investorProducts);
+
+        createAuditTrail(investorProducts.getId(), previousBalance, investorProducts.getBalance());
+        updateWithdrawalStatus(withdrawal, "DONE");
+
+        createAuditTrailForWithdrawalStatus(withdrawal.getId(), "EXECUTING", "DONE");
+
+        return ResponseEntity.ok("Successful withdrawal");
+    }
+
+    private void updateWithdrawalStatus(Withdrawal withdrawal, String status) {
+        withdrawal.setStatus(status);
+        withdrawalRepository.save(withdrawal);
+    }
+
+    private void createAuditTrail(Long productId, BigDecimal previousBalance, BigDecimal newBalance) {
+        AuditTrail auditTrail = new AuditTrail();
+        auditTrail.setProductId(productId);
+        auditTrail.setPreviousBalance(previousBalance);
+        auditTrail.setNewBalance(newBalance);
+        auditTrailRepository.save(auditTrail);
+    }
+
+    private void createAuditTrailForWithdrawalStatus(Long withdrawalId, String previousStatus, String newStatus) {
+        AuditTrail withdrawalAuditTrail = new AuditTrail();
+        withdrawalAuditTrail.setWithdrawalId(withdrawalId);
+        withdrawalAuditTrail.setPreviousStatus(previousStatus);
+        withdrawalAuditTrail.setNewStatus(newStatus);
+        auditTrailRepository.save(withdrawalAuditTrail);
     }
 }
