@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,9 @@ class InvestorControllerTest {
 
     @Mock
     private InvestorService investorService;
+
+    @Mock
+    private BindingResult result;
 
     @BeforeEach
     void setUp() {
@@ -46,7 +50,7 @@ class InvestorControllerTest {
         InvestorAuthenticationRequest request = new InvestorAuthenticationRequest("email@example.com", "password");
         when(investorService.authenticateInvestor(request)).thenReturn(new ResponseEntity<>("token", HttpStatus.OK));
 
-        ResponseEntity<String> response = investorController.authenticateAndGetToken(request);
+        ResponseEntity<String> response = investorController.authenticateAndGetToken(request,result);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("token", response.getBody());
     }

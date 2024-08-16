@@ -19,11 +19,5 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private ProductType type;
-    private String name;
-    private BigDecimal balance;
-    @ManyToOne
-    @Fetch(FetchMode.SELECT)
-    @JoinColumn(name = "investor_id")
-    private Investor investor;
 
 }

@@ -6,9 +6,11 @@ import com.MomentumInvestments.MomentumInvestmentsApplication.entity.Investor;
 import com.MomentumInvestments.MomentumInvestmentsApplication.services.InvestorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,7 +44,10 @@ public class InvestorController {
 
     @PostMapping(path = "/login")
     @Operation(summary = "Login & Get JWT Token used to access all tokens")
-    public ResponseEntity<String> authenticateAndGetToken(@RequestBody final InvestorAuthenticationRequest authRequest) {
+    public ResponseEntity<String> authenticateAndGetToken(@RequestBody @Valid final InvestorAuthenticationRequest authRequest, BindingResult result) {
+        if(result.hasErrors()){
+            return ResponseEntity.badRequest().body(result.getAllErrors().toString());
+        }
         return investorService.authenticateInvestor(authRequest);
     }
 
