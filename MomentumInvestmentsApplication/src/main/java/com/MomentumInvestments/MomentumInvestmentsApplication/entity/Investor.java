@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -23,4 +25,7 @@ public class Investor {
     private String email;
     private String password;
     private String role;
+
+    @OneToMany(mappedBy = "investor")
+    private List<InvestorProducts> investorProducts;
 }

@@ -4,11 +4,9 @@ import com.MomentumInvestments.MomentumInvestmentsApplication.constants.ProductT
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -18,6 +16,11 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     private ProductType type;
+    private String name;
+
+    @OneToMany(mappedBy = "product")
+    private List<InvestorProducts> productInvestors;
 
 }

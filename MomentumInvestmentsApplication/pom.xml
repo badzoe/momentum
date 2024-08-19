@@ -92,11 +92,7 @@
 			<version>5.0.0</version>
 			<scope>provided</scope>
 		</dependency>
-		<!--<dependency>
-			<groupId>org.flywaydb</groupId>
-			<artifactId>flyway-core</artifactId>
-			<version>10.17.1</version>
-		</dependency>-->
+
 		<!-- JUnit 5 dependency -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
