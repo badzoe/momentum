@@ -5,9 +5,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-import java.util.Set;
-
 @Entity
 @Getter
 @Setter
@@ -19,8 +16,5 @@ public class Product {
 
     private ProductType type;
     private String name;
-
-    @OneToMany(mappedBy = "product")
-    private List<InvestorProducts> productInvestors;
 
 }

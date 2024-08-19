@@ -1,2 +1,0 @@
-INSERT INTO investor(id, name, surname, dateOfBirth, address, phoneNumber, email, password, role )
-VALUES (2, 'Tinashe', 'Nyenge', '2000-01-01', '41 Allens Nek joburg', 'o652873902' 'tbnyenge@gmail.com', '$2a$10$FudtZNKSbrQgcXg' 'Investor');
