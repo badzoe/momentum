@@ -38,15 +38,15 @@ public class ProductService {
         return ResponseEntity.ok(productRepository.findAll());
     }
 
-    public ResponseEntity<String> addProducts(String productName) {
-        Optional<Product> optionalProduct = productRepository.findFirstByTypeOrderByIdDesc(ProductType.valueOf(productName));
+    public ResponseEntity<String> addProducts(String name) {
+        Optional<Product> optionalProduct = productRepository.findFirstByTypeOrderByIdDesc(ProductType.valueOf(name));
         if(optionalProduct.isPresent()){
             return ResponseEntity.badRequest().body("Product already exists");
 
         }else {
             Product productToBeAdded = new Product();
             productToBeAdded.setId(0L);
-            productToBeAdded.setType(ProductType.valueOf(productName));
+            productToBeAdded.setType(ProductType.valueOf(name));
             productRepository.save(productToBeAdded);
             return ResponseEntity.ok("Successfully added product");
         }
@@ -66,12 +66,12 @@ public class ProductService {
                     return ResponseEntity.ok("Successfully updated the investors product balance");
 
                 }else {
-                    InvestorProducts newInvestorProduct = new InvestorProducts();
-                    newInvestorProduct.setId(0L);
-                    newInvestorProduct.setInvestorID(optionalInvestor.get());
-                    newInvestorProduct.setProductID(optionalProduct.get());
-                    newInvestorProduct.setBalance(investProduct.balance());
-                    investorProductsRepository.save(newInvestorProduct);
+                    InvestorProducts newInvestorProducts = new InvestorProducts();
+                    newInvestorProducts.setId(0L);
+                    newInvestorProducts.setInvestorID(optionalInvestor.get());
+                    newInvestorProducts.setProductID(optionalProduct.get());
+                    newInvestorProducts.setBalance(investProduct.balance());
+                    investorProductsRepository.save(newInvestorProducts);
                     return ResponseEntity.ok("Successfully saved investor product");
 
 

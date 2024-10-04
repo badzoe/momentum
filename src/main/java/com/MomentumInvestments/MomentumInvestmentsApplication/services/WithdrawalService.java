@@ -1,6 +1,7 @@
 package com.MomentumInvestments.MomentumInvestmentsApplication.services;
 
 import com.MomentumInvestments.MomentumInvestmentsApplication.constants.ProductType;
+import com.MomentumInvestments.MomentumInvestmentsApplication.dto.Request.MicroServiceRequest;
 import com.MomentumInvestments.MomentumInvestmentsApplication.dto.Responses.WithdrawalsResponse;
 import com.MomentumInvestments.MomentumInvestmentsApplication.entity.*;
 import com.MomentumInvestments.MomentumInvestmentsApplication.exception.ValidationException;
@@ -28,6 +29,7 @@ public class WithdrawalService {
     private final InvestorProductsRepository investorProductsRepository;
     private final WithdrawalRepository withdrawalRepository;
     private final AuditTrailRepository auditTrailRepository;
+    private final RabbitMQService rabbitMQService;
 
     public ResponseEntity<List<WithdrawalsResponse>> successfulWithdrawalsPerProduct (String productType ){
 
@@ -145,6 +147,7 @@ public class WithdrawalService {
         updateWithdrawalStatus(withdrawal, "DONE");
 
         createAuditTrailForWithdrawalStatus(withdrawal.getId(), "EXECUTING", "DONE");
+        rabbitMQService.dispatchToQueue(new MicroServiceRequest())
 
         return ResponseEntity.ok("Successful withdrawal");
     }

@@ -1,6 +1,8 @@
 package com.MomentumInvestments.MomentumInvestmentsApplication.config.security;
 
+import com.MomentumInvestments.MomentumInvestmentsApplication.repository.InvestorRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import io.jsonwebtoken.Claims;
@@ -23,8 +25,12 @@ public class JwtService {
     @Value("${jwt.secret}")
     public String SECRET ;
 
+    @Autowired
+    private InvestorRepository investorRepository;
+
     public String generateToken(String userName) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("userID",investorRepository.findByName(userName).get().getId());
         return createToken(claims, userName);
     }
     private String createToken(Map<String, Object> claims, String userName) {
@@ -68,4 +74,3 @@ public class JwtService {
     }
 
 }
-
