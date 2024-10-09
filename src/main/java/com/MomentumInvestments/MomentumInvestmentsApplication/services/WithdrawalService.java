@@ -32,6 +32,7 @@ public class WithdrawalService {
     private final WithdrawalRepository withdrawalRepository;
     private final AuditTrailRepository auditTrailRepository;
     private final RabbitMQService rabbitMQService;
+    private final EmailListRepository emailListRepository;
 
     public ResponseEntity<List<WithdrawalsResponse>> successfulWithdrawalsPerProduct (String productType ){
 
@@ -149,12 +150,19 @@ public class WithdrawalService {
         updateWithdrawalStatus(withdrawal, "DONE");
 
         createAuditTrailForWithdrawalStatus(withdrawal.getId(), "EXECUTING", "DONE");
+        EmailList email = new EmailList();
+        email.setId(0l);
+        email.setToEmail("tapschibz@gmail.com");
+        email.setTitle("TRANSACTION STATUS");
+        email.setBodyMessage("Successfully performed withdrawal on your account");
+
+        EmailList savedEmail = emailListRepository.save(email);
         rabbitMQService.dispatchToQueue(
                 new MicroServiceRequest(
-                        123L,
-                        "ronoldmutangabende@gmail.com",
-                        "Notification Title",
-                        "Your transaction has been processed successfully.",
+                        savedEmail.getId(),
+                        savedEmail.getToEmail(),
+                        savedEmail.getTitle(),
+                        savedEmail.getBodyMessage(),
                         "SUCCESS",
                         LocalDateTime.now(),
                         LocalDateTime.now()
