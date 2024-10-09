@@ -18,6 +18,8 @@ import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,7 +52,7 @@ public class WithdrawalService {
     }
 
     @Transactional
-    public ResponseEntity<String> processWithdrawal(Long investorID, Long productId, BigDecimal amount) throws ValidationException {
+    public ResponseEntity<String> processWithdrawal(Long investorID, Long productId, BigDecimal amount) throws ValidationException, ExecutionException, InterruptedException, TimeoutException {
         Optional<Investor> optionalInvestor = investorRepository.findById(investorID);
         if (optionalInvestor.isEmpty()) {
 
@@ -128,7 +130,7 @@ public class WithdrawalService {
         return ResponseEntity.badRequest().body(failureMessage);
     }
 
-    private ResponseEntity<String> executeWithdrawal(InvestorProducts investorProducts, BigDecimal amount) {
+    private ResponseEntity<String> executeWithdrawal(InvestorProducts investorProducts, BigDecimal amount) throws ExecutionException, InterruptedException, TimeoutException {
         Withdrawal withdrawal = new Withdrawal();
         withdrawal.setProduct(investorProducts);
         withdrawal.setAmount(amount);
@@ -147,7 +149,17 @@ public class WithdrawalService {
         updateWithdrawalStatus(withdrawal, "DONE");
 
         createAuditTrailForWithdrawalStatus(withdrawal.getId(), "EXECUTING", "DONE");
-        rabbitMQService.dispatchToQueue(new MicroServiceRequest())
+        rabbitMQService.dispatchToQueue(
+                new MicroServiceRequest(
+                        123L,
+                        "ronoldmutangabende@gmail.com",
+                        "Notification Title",
+                        "Your transaction has been processed successfully.",
+                        "SUCCESS",
+                        LocalDateTime.now(),
+                        LocalDateTime.now()
+
+        ),rabbitMQService.getCorrelationData());
 
         return ResponseEntity.ok("Successful withdrawal");
     }

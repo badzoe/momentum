@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 @RestController
 @AllArgsConstructor
@@ -21,7 +23,7 @@ public class WithdrawalController {
 
     @PostMapping("/{userId}/{productId}/{amount}")
     @Operation(summary = "Withdraw Product")
-    public ResponseEntity<String> createWithdrawal(@PathVariable String userId,@PathVariable String productId, @PathVariable String amount) {
+    public ResponseEntity<String> createWithdrawal(@PathVariable String userId,@PathVariable String productId, @PathVariable String amount) throws ExecutionException, InterruptedException, TimeoutException {
         return withdrawalService.processWithdrawal(Long.valueOf(userId),Long.valueOf(productId),BigDecimal.valueOf(Long.parseLong(amount)));
     }
 

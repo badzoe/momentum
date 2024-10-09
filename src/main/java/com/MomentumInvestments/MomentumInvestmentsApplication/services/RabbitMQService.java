@@ -42,7 +42,7 @@ public class RabbitMQService {
         try {
             rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter());
             rabbitTemplate.convertAndSend(
-                    "CHIBINDITECHNOLOGIES" + '.' + "ZW.TMS.OPENIT" + '.' + "EMAILNOTIFICATIONS",
+                    "MUTANGABENDETECHNOLOGIES" + '.' + "ZW.TMS.OPENIT" + '.' + "EMAILNOTIFICATIONS",
                     "ZW.TMS.OPENIT" + "." + "EMAILNOTIFICATIONS",
                     emailServiceRequest,
                     correlationData

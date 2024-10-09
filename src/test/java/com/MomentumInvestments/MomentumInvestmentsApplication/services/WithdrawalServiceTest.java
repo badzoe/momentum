@@ -18,6 +18,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -102,7 +104,7 @@ class WithdrawalServiceTest {
     }
 
     @Test
-    void testProcessWithdrawal_InvestorNotRegistered() throws ValidationException {
+    void testProcessWithdrawal_InvestorNotRegistered() throws ValidationException, ExecutionException, InterruptedException, TimeoutException {
         when(investorRepository.findById(1L)).thenReturn(Optional.empty());
 
         ResponseEntity<String> response = withdrawalService.processWithdrawal(1L, 2L, BigDecimal.valueOf(500));
@@ -112,7 +114,7 @@ class WithdrawalServiceTest {
     }
 
     @Test
-    void testProcessWithdrawal_ProductNotRegistered() throws ValidationException {
+    void testProcessWithdrawal_ProductNotRegistered() throws ValidationException, ExecutionException, InterruptedException, TimeoutException {
         when(investorRepository.findById(1L)).thenReturn(Optional.of(new Investor()));
         when(productRepository.findById(2L)).thenReturn(Optional.empty());
 
@@ -123,7 +125,7 @@ class WithdrawalServiceTest {
     }
 
     @Test
-    void testProcessWithdrawal_NoMatchingInvestment() throws ValidationException {
+    void testProcessWithdrawal_NoMatchingInvestment() throws ValidationException, ExecutionException, InterruptedException, TimeoutException {
         when(investorRepository.findById(1L)).thenReturn(Optional.of(new Investor()));
         when(productRepository.findById(2L)).thenReturn(Optional.of(new Product()));
         when(investorProductsRepository.findFirstByProductID_IdAndInvestorID_IdOrderByIdDesc(2L, 1L))
@@ -136,7 +138,7 @@ class WithdrawalServiceTest {
     }
 
     @Test
-    void testProcessWithdrawal_WithdrawalExceedsBalance() throws ValidationException {
+    void testProcessWithdrawal_WithdrawalExceedsBalance() throws ValidationException, ExecutionException, InterruptedException, TimeoutException {
         Investor investor = new Investor();
         Product product = new Product();
         product.setType(ProductType.SAVINGS);
@@ -156,7 +158,7 @@ class WithdrawalServiceTest {
     }
 
     @Test
-    void testProcessWithdrawal_WithdrawalExceeds90Percent() throws ValidationException {
+    void testProcessWithdrawal_WithdrawalExceeds90Percent() throws ValidationException, ExecutionException, InterruptedException, TimeoutException {
         Investor investor = new Investor();
         Product product = new Product();
         product.setType(ProductType.SAVINGS);
@@ -176,7 +178,7 @@ class WithdrawalServiceTest {
     }
 
     @Test
-    void testProcessWithdrawal_Success() throws ValidationException {
+    void testProcessWithdrawal_Success() throws ValidationException, ExecutionException, InterruptedException, TimeoutException {
         Investor investor = new Investor();
         investor.setDateOfBirth(String.valueOf(LocalDate.parse(LocalDate.now().minusYears(70).toString())));
         Product product = new Product();
