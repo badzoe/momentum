@@ -29,7 +29,7 @@ public class RabbitMQConfigs {
 
     @Bean
     public Queue createNotificationsQueue() {
-        return new Queue("ZW.TMS.OPENIT.EMAILNOTIFICATIONS", true, false, false);
+        return new Queue("zw.test.test.emails", true, false, false);
     }
 
     @Bean
@@ -37,12 +37,12 @@ public class RabbitMQConfigs {
         return BindingBuilder
                 .bind(createNotificationsQueue())
                 .to(notificationsServiceExchange())
-                .with("ZW.TMS.OPENIT.EMAILNOTIFICATIONS");
+                .with("zw.test.test.emails");
     }
 
     @Bean
     public TopicExchange notificationsServiceExchange() {
-        return new TopicExchange("MUTANGABENDETECHNOLOGIES.ZW.TMS.OPENIT.EMAILNOTIFICATIONS");
+        return new TopicExchange("MUTANGABENDETECHNOLOGIES.zw.test.test.emails");
     }
 
     @Bean
