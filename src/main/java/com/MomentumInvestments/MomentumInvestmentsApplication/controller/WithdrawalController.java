@@ -1,41 +1,122 @@
 package com.MomentumInvestments.MomentumInvestmentsApplication.controller;
 
-import com.MomentumInvestments.MomentumInvestmentsApplication.dto.Responses.WithdrawalsResponse;
 import com.MomentumInvestments.MomentumInvestmentsApplication.services.WithdrawalService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
-@RestController
+@Controller
 @AllArgsConstructor
-@RequestMapping("/api/withdrawals")
-@Tag(name="Withdrawal")
+@Tag(name = "Withdrawal")
 public class WithdrawalController {
 
     private final WithdrawalService withdrawalService;
 
-    @PostMapping("/{userId}/{productId}/{amount}")
-    @Operation(summary = "Withdraw Product")
-    public ResponseEntity<String> createWithdrawal(@PathVariable String userId,@PathVariable String productId, @PathVariable String amount) throws ExecutionException, InterruptedException, TimeoutException {
-        return withdrawalService.processWithdrawal(Long.valueOf(userId),Long.valueOf(productId),BigDecimal.valueOf(Long.parseLong(amount)));
+    @GetMapping("/withdraw")
+    public String showWithdrawalPage(Model model) {
+        return "WithdrawalPage";
     }
 
-    @GetMapping("/successful/{productType}")
-    @Operation(summary = "Successful Withdrawal Per Product Type")
-    public ResponseEntity<List<WithdrawalsResponse>> successfulWithdrawalsPerProduct(@PathVariable String productType) {
-        return withdrawalService.successfulWithdrawalsPerProduct(productType);
+    @GetMapping("/withdraw/retirement")
+    public String showSavingsWithdrawalPage(Model model) {
+        model.addAttribute("welcomeMessage", "Welcome! Please complete your retirement withdrawal request.");
+        return "RetirementWithdrawal";
     }
 
-    @GetMapping("/failed/{productType}")
-    @Operation(summary = "Failed Withdrawal Per Product")
-    public ResponseEntity<List<WithdrawalsResponse>> failedWithdrawalsPerProduct(@PathVariable String productType) {
-        return withdrawalService.failedWithdrawalsPerProduct(productType);
+    @GetMapping("/withdraw/savings")
+    public String showRetirementWithdrawalPage(Model model) {
+        model.addAttribute("welcomeMessage", "Welcome! Please complete your savings withdrawal request.");
+        return "SavingsWithdrawal";
     }
+
+    @PostMapping("/withdraw/retirement/process")
+    @Operation(summary = "Process Retirement Withdrawal")
+    public String processSavingsWithdrawal(
+            @RequestParam("investorId") String investorId,
+            @RequestParam("productId") String productId,
+            @RequestParam("amount") String amount,
+            Model model) throws ExecutionException, InterruptedException, TimeoutException {
+
+        // Validate product ID
+        String productName;
+        if ("22".equals(productId)) { // Assuming '24' is the valid ID for Retirement
+            productName = "Retirement";
+        } else {
+            model.addAttribute("message", "Invalid product ID.");
+            return "withdrawalFailure"; // Redirect to failure page if productId is invalid
+        }
+
+        try {
+            // Convert inputs to appropriate types
+            Long investorIdLong = Long.valueOf(investorId);
+            BigDecimal withdrawalAmount = new BigDecimal(amount); // Convert amount safely
+
+            // Call the withdrawal service to process the request
+            ResponseEntity<String> response = withdrawalService.processWithdrawal(investorIdLong, Long.valueOf(productId), withdrawalAmount);
+
+            // Check response and set message accordingly
+            if (response.getStatusCode().is2xxSuccessful()) {
+                model.addAttribute("message", productName + " withdrawal was successful!");
+            } else {
+                model.addAttribute("message", productName + " withdrawal failed.");
+            }
+        } catch (NumberFormatException e) {
+            model.addAttribute("message", "Invalid amount format. Please enter a valid number.");
+            return "withdrawalFailure";
+        }
+
+        return "RetirementWithdrawal"; // Redirect to success page on completion
+    }
+
+
+    @PostMapping("/withdraw/savings/process")
+    @Operation(summary = "Process Withdrawal")
+    public String handleWithdrawal(
+            @RequestParam("investorId") String investorId,
+            @RequestParam("amount") String amount,
+            @RequestParam("productId") String productId, // Ensure this is passed correctly
+            Model model) throws ExecutionException, InterruptedException, TimeoutException {
+
+        // Validate product ID
+        String productName;
+        if ("23".equals(productId)) {
+            productName = "Savings";
+        } else {
+            model.addAttribute("message", "Invalid product ID.");
+            return "withdrawalFailure"; // Redirect to failure page if productId is invalid
+        }
+
+        try {
+            // Convert inputs to appropriate types
+            Long investorIdLong = Long.valueOf(investorId);
+            BigDecimal withdrawalAmount = new BigDecimal(amount); // Convert amount safely
+
+            // Call the withdrawal service to process the request
+            ResponseEntity<String> response = withdrawalService.processWithdrawal(investorIdLong, Long.valueOf(productId), withdrawalAmount);
+
+            // Check response and set message accordingly
+            if (response.getStatusCode().is2xxSuccessful()) {
+                model.addAttribute("message", productName + " withdrawal was successful!");
+            } else {
+                model.addAttribute("message", productName + " withdrawal failed.");
+            }
+        } catch (NumberFormatException e) {
+            model.addAttribute("message", "Invalid amount format. Please enter a valid number.");
+            return "withdrawalFailure";
+        }
+
+        return "SavingsWithdrawal"; // Redirect to success page on completion
+    }
+
+
 }

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Momentum Investments</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding-top: 56px; /* Padding for navbar */
+        }
+        .navbar {
+            background-color: #007bff;
+        }
+        .navbar-brand, .nav-link {
+            color: white !important;
+        }
+        .blog-section {
+            padding: 50px 0;
+        }
+        .blog-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .blog-card {
+            margin-bottom: 30px;
+        }
+        .blog-card h5 {
+            font-size: 1.25rem;
+        }
+        footer {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">Momentum Investments</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"><i class="fas fa-bars"></i></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/login}">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/register}">Register</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<header class="jumbotron text-center bg-primary text-white">
+    <div class="container">
+        <h1 class="display-4">Welcome to Momentum Investments</h1>
+        <p class="lead">Your trusted platform for growing your investments</p>
+        <a th:href="@{/register}" class="btn btn-light btn-lg">Get Started</a>
+    </div>
+</header>
+
+<!-- Blog Section -->
+<section class="blog-section">
+    <div class="container">
+        <h2 class="blog-title">Latest Investment Tips & News</h2>
+        <div class="row">
+            <!-- Blog Post 1 -->
+            <div class="col-md-4">
+                <div class="card blog-card">
+                    <img src="/images/learning.jpg" class="card-img-top" alt="Blog Image 1">
+                    <div class="card-body">
+                        <h5 class="card-title">How to Start Investing in 2024</h5>
+                        <p class="card-text">Learn the best strategies to start investing in Savings, and Retirement.</p>
+                        <a href="#" class="btn btn-primary">Read More</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Blog Post 2 -->
+            <div class="col-md-4">
+                <div class="card blog-card">
+                    <img src="/images/retirement-savings.jpg" class="card-img-top" alt="Blog Image 2">
+                    <div class="card-body">
+                        <h5 class="card-title">Investment Tips for Beginners</h5>
+                        <p class="card-text">Discover the key tips every beginner should know before investing.</p>
+                        <a href="#" class="btn btn-primary">Read More</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Blog Post 3 -->
+            <div class="col-md-4">
+                <div class="card blog-card">
+                    <img src="/images/market-trends.jpg" class="card-img-top" alt="Blog Image 3">
+                    <div class="card-body">
+                        <h5 class="card-title">2024 Market Trends</h5>
+                        <p class="card-text">Stay ahead of the game by understanding the upcoming market trends.</p>
+                        <a href="#" class="btn btn-primary">Read More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    <p>&copy; 2024 Momentum Investments. All Rights Reserved.</p>
+</footer>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

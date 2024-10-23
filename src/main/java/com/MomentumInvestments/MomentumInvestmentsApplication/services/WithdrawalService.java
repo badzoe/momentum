@@ -152,7 +152,7 @@ public class WithdrawalService {
         createAuditTrailForWithdrawalStatus(withdrawal.getId(), "EXECUTING", "DONE");
         EmailList email = new EmailList();
         email.setId(0l);
-        email.setToEmail("tapschibz@gmail.com");
+        email.setToEmail("ronoldmutangabende2001@gmail.com");
         email.setTitle("TRANSACTION STATUS");
         email.setBodyMessage("Successfully performed withdrawal on your account");
 

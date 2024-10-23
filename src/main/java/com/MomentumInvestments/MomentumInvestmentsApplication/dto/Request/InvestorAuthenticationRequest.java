@@ -11,5 +11,6 @@ public record InvestorAuthenticationRequest(
 
         public String getEmail() {
                 return username;
-        }
+
+        }// No need for a getter for email; it is automatically created.
 }

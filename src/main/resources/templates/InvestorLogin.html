@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <h1 class="p-3">Login</h1>
+    <form th:action="@{/saveLogin}" method="post">
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label for="email">Email</label>
+                <input type="email" name="email" class="form-control input-sm" id="email" required="required">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label for="password">Password</label>
+                <input type="password" name="password" class="form-control input-sm" id="password" required="required">
+            </div>
+        </div>
+
+        <div class="row p-2">
+            <div class="col-md-2">
+                <button class="btn btn-primary">Login</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script th:inline="javascript">
+    window.onload = function() {
+        var msg = /*[[${message}]]*/ 'none';
+        if (msg === 'login success') {
+            toastr.success("Login successful!");
+        } else if (msg === 'login failed') {
+            toastr.error("Login failed! Please try again.");
+        }
+        toastr.options = {
+            "closeButton": false,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": false,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+    };
+</script>
+
+</body>
+</html>

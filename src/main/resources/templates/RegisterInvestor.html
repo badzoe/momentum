@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Register Investor</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <h1 class="p-3">Register Investor</h1>
+    <form th:action="@{/saveInvestor}" th:object="${inv}" method="post">
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label for="name">Name</label>
+                <input type="text" th:field="*{name}" class="form-control input-sm" id="name" required="required">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label for="surname">Surname</label>
+                <input type="text" th:field="*{surname}" class="form-control input-sm" id="surname" required="required">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label for="dateOfBirth">Date Of Birth</label>
+                <input type="date" th:field="*{dateOfBirth}" class="form-control input-sm" id="dateOfBirth" required="required">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label for="address">Address</label>
+                <input type="text" th:field="*{address}" class="form-control input-sm" id="address" required="required">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label for="phoneNumber">Phone Number</label>
+                <input type="text" th:field="*{phoneNumber}" class="form-control input-sm" id="phoneNumber" required="required">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label for="email">Email</label>
+                <input type="email" th:field="*{email}" class="form-control input-sm" id="email" required="required">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label for="password">Password</label>
+                <input type="password" th:field="*{password}" class="form-control input-sm" id="password" required="required">
+            </div>
+        </div>
+
+        <div class="row p-2">
+            <div class="col-md-2">
+                <button class="btn btn-primary">Register</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script th:inline="javascript">
+    window.onload = function() {
+        var msg = /*[[${message}]]*/ 'none';
+        if (msg === 'save success') {
+            toastr.success("User saved successfully!");
+        } else if (msg === 'save failed') {
+            toastr.error("User not saved!");
+        }
+        toastr.options = {
+            "closeButton": false,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": false,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+    };
+</script>
+
+</body>
+</html>

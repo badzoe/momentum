@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Register Investor</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+</head>
+<body>
+<div class="container mt-5">
+    <h1>Investor Registration</h1>
+
+    <!-- Display validation errors, if any -->
+    <div th:if="${error}" class="alert alert-danger">
+        <span th:text="${error}"></span>
+    </div>
+
+    <form th:action="@{/api/investor/saveInvestor}" th:object="${investorCreation}" method="post">
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" th:field="*{name}" class="form-control" id="name" placeholder="Enter name" required>
+            <div th:if="${#fields.hasErrors('name')}" class="text-danger" th:errors="*{name}">Name Error</div>
+        </div>
+
+        <div class="form-group">
+            <label for="surname">Surname</label>
+            <input type="text" th:field="*{surname}" class="form-control" id="surname" placeholder="Enter surname" required>
+            <div th:if="${#fields.hasErrors('surname')}" class="text-danger" th:errors="*{surname}">Surname Error</div>
+        </div>
+
+        <div class="form-group">
+            <label for="dateOfBirth">Date of Birth</label>
+            <input type="date" th:field="*{dateOfBirth}" class="form-control" id="dateOfBirth" required>
+            <div th:if="${#fields.hasErrors('dateOfBirth')}" class="text-danger" th:errors="*{dateOfBirth}">Date of Birth Error</div>
+        </div>
+
+        <div class="form-group">
+            <label for="address">Address</label>
+            <input type="text" th:field="*{address}" class="form-control" id="address" placeholder="Enter address" required>
+            <div th:if="${#fields.hasErrors('address')}" class="text-danger" th:errors="*{address}">Address Error</div>
+        </div>
+
+        <div class="form-group">
+            <label for="phoneNumber">Phone Number</label>
+            <input type="text" th:field="*{phoneNumber}" class="form-control" id="phoneNumber" placeholder="Enter phone number" required>
+            <div th:if="${#fields.hasErrors('phoneNumber')}" class="text-danger" th:errors="*{phoneNumber}">Phone Number Error</div>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" th:field="*{email}" class="form-control" id="email" placeholder="Enter email" required>
+            <div th:if="${#fields.hasErrors('email')}" class="text-danger" th:errors="*{email}">Email Error</div>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" th:field="*{password}" class="form-control" id="password" placeholder="Enter password" required>
+            <div th:if="${#fields.hasErrors('password')}" class="text-danger" th:errors="*{password}">Password Error</div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Register</button>
+    </form>
+</div>
+
+<script th:inline="javascript">
+    window.onload = function() {
+        var message = /*[[${message}]]*/ 'none';
+        if (message === 'save success') {
+            toastr.success("Investor registered successfully!");
+        } else if (message === 'save failed') {
+            toastr.error("Investor registration failed!");
+        }
+    };
+</script>
+
+</body>
+</html>

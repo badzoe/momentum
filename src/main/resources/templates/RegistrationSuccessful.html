@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Successful</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding-top: 56px;
+        }
+        .navbar {
+            background-color: #007bff;
+        }
+        .navbar-brand, .nav-link {
+            color: white !important;
+        }
+        .blog-section {
+            padding: 50px 0;
+        }
+        .blog-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .btn-custom {
+            margin-left: 10px;
+        }
+        footer {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar with buttons -->
+<nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">Momentum Investments</a> <!-- Home page link -->
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"><i class="fas fa-bars"></i></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <!-- Buttons for Login and Home -->
+                <li class="nav-item">
+                    <a class="nav-link btn btn-primary btn-custom" th:href="@{/login}">Login</a> <!-- Login link -->
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-secondary btn-custom" th:href="@{/}">Home</a> <!-- Home link -->
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Blog Section (Thank You) -->
+<section class="blog-section">
+    <div class="container">
+        <h2 class="blog-title">Thank You for Registering!</h2>
+        <p class="text-center">
+            Your account has been successfully created. You can now proceed to log in to your account or return to the home page to explore more.
+        </p>
+        <p class="text-center">
+            We are excited to have you on board! Feel free to browse our latest investment opportunities and tips.
+        </p>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    <p>&copy; 2024 Momentum Investments. All Rights Reserved.</p>
+</footer>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
